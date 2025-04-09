@@ -1,0 +1,7 @@
+[[complexity. approaches to solve]]
+[[The nature of complexity]]
+[[Working code isn't enough]]
+[[Modules should be deep]]
+[[Information hiding (and leakage)]]
+[[General-purpose modules are deeper]]
+[[Different Layer, Different Abstraction]]

@@ -1,0 +1,2 @@
+поможет service discovery
+#паттерны

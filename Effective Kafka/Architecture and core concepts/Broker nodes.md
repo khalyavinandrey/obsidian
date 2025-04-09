@@ -1,0 +1,10 @@
+A Kafka broker is a Java process that acts as part of a larger cluster, where the minimum size of the cluster is one. (Indeed, we often use a singleton cluster for testing.) A broker is one of the units of scalability in Kafka; <u>by increasing the number of brokers, one can achieve improved I/O, availability, and durability characteristics. (There are other ways of scaling Kafka, as we shall soon discover.)</u>
+
+A broker fulfills its persistence obligations by hosting a set of append-only log files that comprise the partitions hosted by the cluster.
+<u>Each partition is mastered by exactly one broker — the partition leader.</u>
+
+Partition data is replicated to a set of zero or more follower brokers. Collectively, the leader and the followers are referred to as replicas. Brokers share the load of leader and follower roles among themselves; a broker node may act as the leader for certain replicas, while being a follower for others. The roles may change — a follower replica may be promoted to leader status in the event of failure or as part of a manual rebalancing operation. The notion of replicas satisfies the durability guarantee; the more replicas in a cluster, the lower the likelihood of data loss due to an isolated replica failure
+
+Broker nodes are largely identical in every way; <u>each node competes for the mastership of partition data</u> on equal footing with its peers. Given the symmetric nature of the cluster, Kafka requires a mechanism for arbitrating the roles within the cluster and assigning partition leadership statuses among the broker nodes. Rather than making these decisions collectively, broker nodes follow a rudimentary chain-of-command. A single node is elected as the cluster controller which, in turn, directs all nodes (including itself) to assume specific roles. In other words, <u>it is the controller’s responsibility for managing the states of partitions and replicas, and for performing administrative tasks like reassigning partitions among the broker nodes.</u>
+
+#effectivekafka

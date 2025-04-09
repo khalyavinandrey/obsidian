@@ -1,0 +1,15 @@
+suppose one downstream subscriber is a tournament leaderboard application, needing to capture and present the relative standing of the teams as they progress through a tournament. Match-centric order may be insufficient, as goals would need to be collated in tournament order.
+
+The first is to coarsen the granularity of event ordering, for example, using the tournament identifier is the <u>record key</u>. This preserves the chronological order of in-play events within a tournament, and by extension, within a match. The second approach is to transfer the responsibility of event reordering to the downstream subscriber.
+
+<u>The main drawback of first approach is the reduced opportunity for consumer parallelism, as coarsening leads to a reduction in the cardinality of the partitioning key</u>. Subscribers will not be able to utilise Kafka’s load-balancing capabilities to process match-level substreams in parallel; only tournaments will be subject to parallelism. This may satisfy some subscribers, but penalise others.
+
+An extension of this model is to introduce conditioning stages for those subscribers that would benefit from the finer granularity. <u>A conditioning stage would consume a record from a coarsegrained input topic, then republish the same value to an output topic with a different key — for example, switching the key from a tournament ID to a match ID.</u> This model nicely dovetails into the broader principle of producer-driven domain modelling, while satisfying individual subscriber needs with the help of SEDA.
+
+The second approach — fine-grained causal chains with consumer-side reordering — assumes that the consumer, or some intermediate stage acting on its behalf, is responsible for coarsening the granularity of the event substreams to fit some bespoke processing need. <u>The conditioning stage will need to be stateful, maintaining a staging datastore for incoming events so that they can be reordered. In practice, this is much more difficult than it appears.</u> In some cases, there simply isn’t enough data available for a downstream stage to reconstruct the original event order. In short, consumer-side reordering may not always a viable option.
+
+There is no one-size-fits-all approach to partitioning domain events. As a rule of thumb, the <u>producer should publish at the finest level of granularity that makes sense in its respective domain, while supporting a diverse subscriber base</u>.
+
+A crucial point: being agnostic of subscribers does not equate to being ignorant of their needs. The effective modelling of the domain and the associated event streams fall on the shoulders of architects and senior technologists; stakeholder consultation and understanding of the overall landscape are essential in constructing a sustainable solution.
+
+#effectivekafka
